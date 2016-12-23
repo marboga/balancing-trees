@@ -47,37 +47,6 @@ AVL.prototype.Insert = function(val) {
     }
 }
 
-AVL.prototype.ForceInsert = function(val) {
-    var newNode = new AVLNode(val);
-    if(!this.root) {
-        this.root = newNode;
-        return this; 
-    }
-    var current = this.root;
-    while(current) {
-        if(current.value > val) {
-            if(!current.left) {
-                current.left = newNode;
-                newNode.parent = current;
-                if(!current.right) {
-                    current.height += 1;
-                }
-                return this;
-            }
-            current = current.left;
-        } else {
-            if(!current.right) {
-                current.right = newNode;
-                if(!current.left) {
-                    current.height += 1;
-                }
-                return this;
-            }
-            current = current.right;
-        }
-    }
-}
-
 AVL.prototype.Balance = function(node, childIsLeft) {
     while(node.parent) {
         var curParent = node.parent;
@@ -220,4 +189,35 @@ AVL.prototype.rightLeftRotate = function(node, parentIsRoot) {
 //         return 0;
 //     }
 //     return 1 + Height(node.left) + Height(node.right);
+// }
+
+// AVL.prototype.ForceInsert = function(val) {
+//     var newNode = new AVLNode(val);
+//     if(!this.root) {
+//         this.root = newNode;
+//         return this; 
+//     }
+//     var current = this.root;
+//     while(current) {
+//         if(current.value > val) {
+//             if(!current.left) {
+//                 current.left = newNode;
+//                 newNode.parent = current;
+//                 if(!current.right) {
+//                     current.height += 1;
+//                 }
+//                 return this;
+//             }
+//             current = current.left;
+//         } else {
+//             if(!current.right) {
+//                 current.right = newNode;
+//                 if(!current.left) {
+//                     current.height += 1;
+//                 }
+//                 return this;
+//             }
+//             current = current.right;
+//         }
+//     }
 // }
