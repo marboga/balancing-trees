@@ -24,10 +24,43 @@ AVL.prototype.Insert = function(val) {
         if(current.value > val) {
             if(!current.left) {
                 current.left = newNode;
+                newNode.parent = current
+                if(!current.right) {
+                    current.height += 1;
+                    this.Balance(current, true);
+                }
+                return this;
+            }
+            current = current.left;
+        } else {
+            if(!current.right) {
+                current.right = newNode;
+                newNode.parent = current;
+                if(!current.left) {
+                    current.height += 1;
+                    this.Balance(current);
+                }
+                return this;
+            }
+            current = current.right;
+        }
+    }
+}
+
+AVL.prototype.ForceInsert = function(val) {
+    var newNode = new AVLNode(val);
+    if(!this.root) {
+        this.root = newNode;
+        return this; 
+    }
+    var current = this.root;
+    while(current) {
+        if(current.value > val) {
+            if(!current.left) {
+                current.left = newNode;
                 newNode.parent = current;
                 if(!current.right) {
                     current.height += 1;
-                    AVL.Balance(current, true);
                 }
                 return this;
             }
@@ -37,7 +70,6 @@ AVL.prototype.Insert = function(val) {
                 current.right = newNode;
                 if(!current.left) {
                     current.height += 1;
-                    AVL.Balance(current);
                 }
                 return this;
             }
@@ -63,9 +95,9 @@ AVL.prototype.Balance = function(node, childIsLeft) {
                     //Rebalance
                     //Need to think about if the parent is the root too
                     if(childIsLeft) {
-                        return rightLeftRotate(node, (!curParent.parent));
+                        return this.rightLeftRotate(node, (!curParent.parent));
                     }
-                    return leftRotate(node, (!curParent.parent));
+                    return this.leftRotate(node, (!curParent.parent));
                 }
                 childIsLeft = false;
             } else {
@@ -76,9 +108,9 @@ AVL.prototype.Balance = function(node, childIsLeft) {
                 }
                 if(checkVal < node.height) {
                     if(!childIsLeft) {
-                        return leftRightRotate(node, (!curParent.parent));
+                        return this.leftRightRotate(node, (!curParent.parent));
                     }
-                    return rightRotate(node, (!curParent.parent));
+                    return this.rightRotate(node, (!curParent.parent));
                 }
                 childIsLeft = true;
             }
@@ -90,15 +122,16 @@ AVL.prototype.Balance = function(node, childIsLeft) {
     }
 }
 
-function leftRotate(node, parentIsRoot) {
+AVL.prototype.leftRotate = function(node, parentIsRoot) {
     var parent = node.parent;
+    parent.right = null;
     if(node.left) {
         parent.right = node.left;
         node.left.parent = parent;
     }
     //Adjust heights
     node.height = parent.height;
-    height -= 1;
+    parent.height -= 1;
     
     //Adjust node pointers
     node.left = parent;
@@ -117,15 +150,16 @@ function leftRotate(node, parentIsRoot) {
     parent.parent = node;
 }
 
-function rightRotate(node, parentIsRoot) {
+AVL.prototype.rightRotate = function(node, parentIsRoot) {
     var parent = node.parent;
+    parent.left = null;
     if(node.right) {
         parent.left = node.right;
         node.right.parent = parent;
     }
     //Adjust heights
     node.height = parent.height;
-    height -= 1;
+    parent.height -= 1;
     
     //Adjust node pointers
     node.right = parent;
@@ -144,12 +178,46 @@ function rightRotate(node, parentIsRoot) {
     parent.parent = node;
 }
 
-function leftRightRotate(node, parentIsRoot) {
-    leftRotate(node.right, false);
-    rightRotate(node.right, parentIsRoot);
+AVL.prototype.leftRightRotate = function(node, parentIsRoot) {
+    this.leftRotate(node.right, false);
+    this.rightRotate(node.right, parentIsRoot);
 }
 
-function rightLeftRotate(node, parentIsRoot) {
-    rightRotate(node.left, false);
-    leftRotate(node.left, parentIsRoot);
+AVL.prototype.rightLeftRotate = function(node, parentIsRoot) {
+    this.rightRotate(node.left, false);
+    this.leftRotate(node.left, parentIsRoot);
 }
+
+///////////////////////TESTING////////////////////////
+// var testTree = new AVL();
+// console.log(testTree.isBalanced());
+// testTree.Insert(7);
+// testTree.Insert(10);
+// testTree.Insert(11);
+// console.log(testTree.isBalanced());
+
+// AVL.prototype.isBalanced = function() {
+//     if(!this.root) {
+//         return true;
+//     }
+//     return isBalanced(this.root);
+// }
+
+// function isBalanced(node) {
+//     if(!node) {
+//         return true;
+//     }
+//     var leftHeight = Height(node.left);
+//     var rightHeight = Height(node.right);
+//     if(Math.abs(leftHeight - rightHeight) > 1) {
+//         return false;
+//     }
+//     return (isBalanced(node.left) && isBalanced(node.right));
+// }
+
+// function Height(node) {
+//     if(!node) {
+//         return 0;
+//     }
+//     return 1 + Height(node.left) + Height(node.right);
+// }
